@@ -24,6 +24,9 @@ library(rgeos)
 sa_files <- list.files(path = here("sensitivity_iterations", "sensitivity_iterations"), pattern = "*tif", full.names = TRUE)
 
 sa_stack <- raster::stack(sa_files)
+
+# write raster stack
+writeRaster(sa_stack, filename = "sensitivity_analysis_stack.tif", options = "INTERLEAVE=BAND", overwrite = TRUE)
 ```
 
 ```{r}
