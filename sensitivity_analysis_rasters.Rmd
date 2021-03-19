@@ -46,6 +46,7 @@ earth <- ne_countries(scale = "medium", returnclass = "sf") %>%
 sa_total <- calc(sa_good, fun = sum, na.rm = TRUE) %>% 
   projectRaster(crs = crs(earth))
 
+writeRaster(sa_total, filename = "sensitivity_analysis_results.tif", options = "INTERLEAVE=BAND", overwrite = TRUE)
 # exploratory plot of the cetacean species richness raster
 plot(sa_total)
 ```
@@ -61,16 +62,54 @@ sa_df$layer[sa_df$layer <= 0] <- NA
 sa_df <- sa_df %>% 
   na.omit(layer)
 
-st_crs(earth)
-st_crs(sa_total)
+# read in subbasin boundary shapefiles
+chowchilla <-
+    st_read(here("chowchilla_project", "chowchilla_project.shp")) %>% 
+    st_transform(crs = crs(earth))
+
+madera <-
+    st_read(here("madera_project", "madera_project.shp")) %>% 
+    st_transform(crs = crs(earth))
+
+subbasins <- rbind(chowchilla, madera) %>%
+    rename("name" = "Basin_Su_1")
 
 ggplot() +
-  geom_sf(data = earth, fill = "white") +
-  coord_sf(xlim = c(-120.45,-119.715), ylim = c(36.8,37.18),
+  geom_sf(data = subbasins, fill = "grey") +
+  coord_sf(xlim = c(-120.56,-119.7), ylim = c(36.79,37.2),
            expand = 0) +
   geom_tile(data = sa_df, aes(x = x, y = y, fill = layer)) +
   scale_fill_gradientn(colors = c("firebrick", "orange", "gold", "lightgreen", "darkgreen")) +
-  theme_bw()
+  theme_void()+
+  labs(fill = "Count of \n'high priority' \nresults",
+       title = "Sensitivity Analysis Results")+
+  theme(plot.title = element_text(hjust = 0.7,
+                                  size = 20),
+        legend.title = element_text(size = 14))
 
+ggsave("sa_results_full_gray.png", height = 6, width = 9)
+
+```
+
+```{r}
+### make version with only top 20% of sites pulled out
+sa_top20 <- sa_df %>% 
+  filter(layer > 0) %>% 
+  slice_max(order_by = layer, prop = 0.2)
+
+ggplot() +
+  geom_sf(data = subbasins, fill = "grey") +
+  coord_sf(xlim = c(-120.56,-119.7), ylim = c(36.79,37.2),
+           expand = 0) +
+  geom_tile(data = sa_top20, aes(x = x, y = y, fill = layer)) +
+  scale_fill_gradientn(colors = c("lightgreen", "darkgreen")) +
+  theme_void()+
+  labs(fill = "Count of \n'high priority' \nresults",
+       title = "Sensitivity Analysis Results - Top 20%")+
+  theme(plot.title = element_text(hjust = 0.7,
+                                  size = 20),
+        legend.title = element_text(size = 14))
+
+ggsave("sa_results_20_gray.png", height = 6, width = 9)
 ```
 
