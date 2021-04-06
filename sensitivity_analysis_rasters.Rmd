@@ -75,19 +75,19 @@ subbasins <- rbind(chowchilla, madera) %>%
     rename("name" = "Basin_Su_1")
 
 ggplot() +
-  geom_sf(data = subbasins, fill = "grey") +
+  geom_sf(data = subbasins, fill = "white") +
   coord_sf(xlim = c(-120.56,-119.7), ylim = c(36.79,37.2),
            expand = 0) +
   geom_tile(data = sa_df, aes(x = x, y = y, fill = layer)) +
   scale_fill_gradientn(colors = c("firebrick", "orange", "gold", "lightgreen", "darkgreen")) +
   theme_void()+
-  labs(fill = "Count of \n'high priority' \nresults",
+  labs(fill = "Number of \niterations \nresulting in \n'high priority' \nscore",
        title = "Sensitivity Analysis Results")+
   theme(plot.title = element_text(hjust = 0.7,
                                   size = 20),
         legend.title = element_text(size = 14))
 
-ggsave("sa_results_full_gray.png", height = 6, width = 9)
+ggsave("sa_results_full_white.png", height = 6, width = 9)
 
 ```
 
@@ -98,18 +98,18 @@ sa_top20 <- sa_df %>%
   slice_max(order_by = layer, prop = 0.2)
 
 ggplot() +
-  geom_sf(data = subbasins, fill = "grey") +
+  geom_sf(data = subbasins, fill = "white") +
   coord_sf(xlim = c(-120.56,-119.7), ylim = c(36.79,37.2),
            expand = 0) +
   geom_tile(data = sa_top20, aes(x = x, y = y, fill = layer)) +
   scale_fill_gradientn(colors = c("lightgreen", "darkgreen")) +
   theme_void()+
-  labs(fill = "Count of \n'high priority' \nresults",
+  labs(fill = "Number of \niterations \nresulting in \n'high priority' \nscore",
        title = "Sensitivity Analysis Results - Top 20%")+
   theme(plot.title = element_text(hjust = 0.7,
                                   size = 20),
         legend.title = element_text(size = 14))
 
-ggsave("sa_results_20_gray.png", height = 6, width = 9)
+ggsave("sa_results_20_white.png", height = 6, width = 9)
 ```
 
